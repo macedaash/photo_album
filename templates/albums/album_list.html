@@ -1,0 +1,45 @@
+{% extends 'albums/base.html' %}
+{% block title %}My Albums{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+  <h1 style="font-size:24px">Albums</h1>
+  <a href="{% url 'album-create' %}" class="btn btn-primary">+ New Album</a>
+</div>
+
+{% if albums %}
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px">
+    {% for album in albums %}
+    <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.07)">
+      <div style="background:#1a1a2e;height:120px;display:flex;align-items:center;justify-content:center">
+        {% with album.photos.first as cover %}
+          {% if cover %}
+            <img src="{{ cover.image.url }}" style="width:100%;height:120px;object-fit:cover" alt="cover">
+          {% else %}
+            <span style="color:#666;font-size:40px">🖼️</span>
+          {% endif %}
+        {% endwith %}
+      </div>
+      <div style="padding:16px">
+        <h3 style="font-size:16px;margin-bottom:4px">{{ album.title }}</h3>
+        <p style="font-size:13px;color:#666;margin-bottom:8px">
+          {{ album.photos.count }} photo{{ album.photos.count|pluralize }}
+          {% if album.is_public %}<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:20px;font-size:11px;margin-left:6px">Public</span>{% endif %}
+        </p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a href="{% url 'album-detail' album.pk %}" class="btn btn-primary" style="font-size:13px;padding:6px 12px">View</a>
+          {% if request.user == album.owner or request.user.is_superuser %}
+            <a href="{% url 'album-update' album.pk %}" class="btn btn-outline" style="font-size:13px;padding:6px 12px">Edit</a>
+            <a href="{% url 'album-delete' album.pk %}" class="btn btn-danger" style="font-size:13px;padding:6px 12px">Delete</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div style="text-align:center;padding:80px 0;color:#888">
+    <p style="font-size:48px">📭</p>
+    <p style="margin-top:12px">No albums yet. <a href="{% url 'album-create' %}">Create your first one!</a></p>
+  </div>
+{% endif %}
+{% endblock %}

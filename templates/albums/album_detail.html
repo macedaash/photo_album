@@ -1,0 +1,47 @@
+{% extends 'albums/base.html' %}
+{% block title %}{{ album.title }}{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <div>
+    <a href="{% url 'album-list' %}" style="font-size:13px;color:#666">← Back to albums</a>
+    <h1 style="font-size:24px;margin-top:6px">{{ album.title }}</h1>
+    {% if album.description %}<p style="color:#555;margin-top:4px">{{ album.description }}</p>{% endif %}
+    <p style="font-size:13px;color:#888;margin-top:4px">
+      By {{ album.owner.username }} · {{ album.photos.count }} photo{{ album.photos.count|pluralize }}
+    </p>
+  </div>
+  {% if request.user == album.owner or request.user.is_superuser %}
+  <div style="display:flex;gap:8px">
+    <a href="{% url 'photo-upload' album.pk %}" class="btn btn-primary">+ Upload Photo</a>
+    <a href="{% url 'album-update' album.pk %}" class="btn btn-outline">Edit Album</a>
+    <a href="{% url 'album-delete' album.pk %}" class="btn btn-danger">Delete</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if album.photos.all %}
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
+    {% for photo in album.photos.all %}
+    <div style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.07)">
+      <img src="{{ photo.image.url }}" alt="{{ photo.caption }}"
+           style="width:100%;height:180px;object-fit:cover;display:block">
+      <div style="padding:10px">
+        {% if photo.caption %}<p style="font-size:13px;margin-bottom:8px">{{ photo.caption }}</p>{% endif %}
+        {% if request.user == photo.uploaded_by or request.user == album.owner or request.user.is_superuser %}
+          <a href="{% url 'photo-delete' photo.pk %}" class="btn btn-danger" style="font-size:12px;padding:4px 10px">Delete</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div style="text-align:center;padding:80px 0;color:#888">
+    <p style="font-size:48px">📷</p>
+    <p style="margin-top:12px">No photos yet.
+      {% if request.user == album.owner %}
+        <a href="{% url 'photo-upload' album.pk %}">Upload the first one!</a>
+      {% endif %}
+    </p>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'albums/base.html' %}
+{% block title %}Delete Album{% endblock %}
+{% block content %}
+<div style="max-width:480px;margin:60px auto;background:#fff;padding:32px;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);text-align:center">
+  <p style="font-size:48px">⚠️</p>
+  <h2 style="margin:16px 0 8px">Delete "{{ object.title }}"?</h2>
+  <p style="color:#666;margin-bottom:24px">This will permanently delete the album and all {{ object.photos.count }} photo{{ object.photos.count|pluralize }} in it.</p>
+  <form method="post" style="display:flex;gap:10px;justify-content:center">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, delete it</button>
+    <a href="{% url 'album-detail' object.pk %}" class="btn btn-outline">Cancel</a>
+  </form>
+</div>
+{% endblock %}
